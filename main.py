@@ -31,5 +31,6 @@ with gr.Blocks() as demo:
     send_button = gr.Button(value="Send")
     send_button.click(fn=respond, inputs=text, outputs=[output, raw_prompt])
 
+embeddings_raw, embeddings_text = create_embeddings([''], use_cuda=True)
 
 demo.launch()
