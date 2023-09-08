@@ -2,5 +2,13 @@ gradio
 transformers
 torch==1.13.1
 numpy
+accelerate
+optimum
+auto-gptq
 
 # pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117
+
+# git clone https://github.com/PanQiWei/AutoGPTQ
+# pip3 install AutoGPTQ/.
+# если ставить не из исходников, cuda на windows не подцепляется
+# Successfully installed auto-gptq-0.5.0.dev0+cu117 gekko-1.0.6
