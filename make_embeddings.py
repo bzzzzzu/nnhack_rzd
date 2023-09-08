@@ -9,9 +9,10 @@ def average_pool(last_hidden_states: Tensor,
     last_hidden = last_hidden_states.masked_fill(~attention_mask[..., None].bool(), 0.0)
     return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
 
-def create_embeddings(string_list, use_cuda=True):
+def create_embeddings(string_dict, use_cuda=True):
     embeddings_raw_name = 'embeddings.npy'
     embeddings_text_name = 'embeddings.txt'
+    embeddings_answer_name = 'embeddings_answer.txt'
 
     if not os.path.exists(embeddings_raw_name):
         tokenizer = AutoTokenizer.from_pretrained('intfloat/multilingual-e5-base')
@@ -20,9 +21,17 @@ def create_embeddings(string_list, use_cuda=True):
         else:
             model = AutoModel.from_pretrained('intfloat/multilingual-e5-base')
 
-        string_list = ['Один', 'Два', 'Три']
-
         embeddings = []
+
+        # пока складываем основную причину с подпричиной
+        string_list = []
+        answer_list = []
+        for key in string_dict.keys():
+            for subkey in string_dict[key]:
+                temp_str = f'{key}. {subkey}.'
+                string_list.append(str.replace(temp_str, '..', '.'))
+                answer_list.append(string_dict[key][subkey])
+
         # медленно (лучше батчами), но просто и исполняется один раз
         for line in string_list:
             if use_cuda:
@@ -38,12 +47,18 @@ def create_embeddings(string_list, use_cuda=True):
         with open(embeddings_text_name, 'w', encoding='utf-8') as f:
             for line in string_list:
                 f.write(line + '\n')
+        with open(embeddings_answer_name, 'w', encoding='utf-8') as f:
+            for line in answer_list:
+                f.write(line + '\n')
 
         embeddings_raw = embeddings
         embeddings_text = string_list
+        embeddings_answer = answer_list
     else:
         embeddings_raw = np.load(embeddings_raw_name)
         with open(embeddings_text_name, 'r', encoding='utf-8') as f:
             embeddings_text = f.readlines()
+        with open(embeddings_answer, 'r', encoding='utf-8') as f:
+            embeddings_answer = f.readlines()
 
-    return embeddings_raw, embeddings_text
+    return embeddings_raw, embeddings_text, embeddings_answer

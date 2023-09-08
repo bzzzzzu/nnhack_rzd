@@ -1,4 +1,5 @@
 # Данные - чтение документа и разбивка на читаемые куски
+import test_loco
 from document_reader import get_text_from_document
 
 # Эмбеддинги
@@ -24,6 +25,7 @@ def respond(text):
 with gr.Blocks() as demo:
     text = gr.Textbox(label="Text")
     output = gr.Textbox(label="Output Box")
+    metod = gr.Textbox(label="Метод устранения", lines=4)
     raw_prompt = gr.Textbox(label="Raw Prompt", lines=10)
 
     text.submit(fn=respond, inputs=text, outputs=[output, raw_prompt])
@@ -31,6 +33,6 @@ with gr.Blocks() as demo:
     send_button = gr.Button(value="Send")
     send_button.click(fn=respond, inputs=text, outputs=[output, raw_prompt])
 
-embeddings_raw, embeddings_text = create_embeddings([''], use_cuda=True)
+embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(test_loco.dict, use_cuda=True)
 
 demo.launch()
