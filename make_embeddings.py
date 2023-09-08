@@ -58,7 +58,18 @@ def create_embeddings(string_dict, use_cuda=True):
         embeddings_raw = np.load(embeddings_raw_name)
         with open(embeddings_text_name, 'r', encoding='utf-8') as f:
             embeddings_text = f.readlines()
-        with open(embeddings_answer, 'r', encoding='utf-8') as f:
+        with open(embeddings_answer_name, 'r', encoding='utf-8') as f:
             embeddings_answer = f.readlines()
 
     return embeddings_raw, embeddings_text, embeddings_answer
+
+# Достаточно быстро работает и на процессоре для одиночных вводов текста
+# Желательно держать модель в памяти, ну пока сойдет
+def get_embedding(text):
+    tokenizer = AutoTokenizer.from_pretrained('intfloat/multilingual-e5-base')
+    model = AutoModel.from_pretrained('intfloat/multilingual-e5-base')
+    batch_dict = tokenizer(text, max_length=512, padding=True, truncation=True, return_tensors='pt')
+    outputs = model(**batch_dict)
+    embedding = average_pool(outputs.last_hidden_state, batch_dict['attention_mask']).cpu().detach().numpy()
+    return embedding
+
