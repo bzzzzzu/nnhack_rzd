@@ -19,7 +19,7 @@ class Processor:
 
         self.model_path = model_path
         self.model_name = model_name
-        print(model_path)
+        # print(model_path)
         if self.model_path.exists():
             #self.tts = TTS(model_path, add_time_to_end=0.8)      # add_time_to_end продолжительность аудио
             self.tts = TTS(model_path)

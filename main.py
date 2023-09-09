@@ -24,6 +24,10 @@ tts = Processor()
 # Gradio main thread
 import gradio as gr
 
+types_of_trains = ['2М62', '2М62', '2ТЭ10М', '2ТЭ10МК', '2ТЭ10У', '2ТЭ10УК', '2ТЭ25А', '2ТЭ25КМ',
+                   '2ТЭ70', '2ТЭ116', '2ТЭ116УД', '2ЭС4К', '2ЭС5К', '3ЭС5К', '2ЭС6', '2ЭС7', '2ЭС10', 'Все']
+selected_train_type = None
+
 def respond(text, to_text=False):
     print(f'user question: {text}')
     embedding = get_embedding(text)
@@ -85,22 +89,37 @@ def respond(text, to_text=False):
         return answer_string, solution_text, full_llm_answer, llm_prompt, text
 
 def text_wrapper(input_text):
-    answer_string, solution_text, full_llm_answer, llm_prompt = respond(input_text)
+    type_of_train, answer_string, solution_text, full_llm_answer, llm_prompt = respond(input_text)
+    
+    # full_llm_answer = 'При ручном (дистанционном) управлении холодильнои камерои не включаются жалюзи и электродвигатели вентиляторов'
+    
     audio = tts.va_speak(full_llm_answer)
     return answer_string, solution_text, full_llm_answer, llm_prompt, audio
 
 def asr_wrapper(wav):
     whisper_text = speech_to_text(wav)
     answer_string, solution_text, full_llm_answer, llm_prompt, text = respond(whisper_text, to_text=True)
+    
+    # full_llm_answer = 'При ручном (дистанционном) управлении холодильнои камерои не включаются жалюзи и электродвигатели вентиляторов ОМ2, ОМ5, 5ОМ, 12ЦКК'
+
     audio = tts.va_speak(full_llm_answer)
     return answer_string, solution_text, full_llm_answer, llm_prompt, text, audio
 
 def tts_speak(input_text):
     audio = tts.va_speak(input_text)
     return audio
-    
+
+
+def type_to_global(input_type):
+    global selected_train_type
+    selected_train_type = input_type
+    # print(selected_train_type)
+    return selected_train_type
+
 
 with gr.Blocks() as demo:
+    # Выбор типа поезда
+    type_of_train = gr.Dropdown(choices=types_of_trains, label="Выберите серию тепловоза / электровоза:", value='Все')
     audio_input = gr.Audio(source="microphone", type="numpy")
     text = gr.Textbox(label="Запрос")
     problem = gr.Textbox(label="Проблема")
@@ -111,16 +130,16 @@ with gr.Blocks() as demo:
 
     audio_input.stop_recording(fn=asr_wrapper, inputs=audio_input, outputs=[problem, solution, llm_answer, raw_prompt, text, audio_output])
     text.submit(fn=text_wrapper, inputs=text, outputs=[problem, solution, llm_answer, raw_prompt, audio_output])
-    
-    # debbug without llm
-    # llm_answer.value = 'Ура работает! Неисправна плата ПВАД или БОАД УОИ. Проверить наличие тока через мотор-вентиляторы и резисторы ЭДТ. Если есть неисправность, то не пользоваться ЭДТ. Если возникает в режиме "Тяги", то отключить ОМ1, ОМ2, ОМ3.'
-    # llm_speech = tts_speak(llm_answer.value)
-
     send_button = gr.Button(value="Отправить")
     send_button.click(fn=text_wrapper, inputs=text, outputs=[problem, solution, llm_answer, raw_prompt, audio_output])
+    type_of_train.change(fn=type_to_global, inputs=type_of_train, outputs=None)
 
 # embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(test_loco.dict, use_cuda=False)
 embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(test_loco.dict, use_cuda=True)
 
 # demo.launch()
 demo.launch(share=True)
+
+
+
+

@@ -29,7 +29,7 @@ alphabet_map = {
     "W": " Double You ",
     "X": " Ex ",
     "Y": " Why ",
-    "Z": " Zed ",  # Zed is weird, as I (da3dsoul) am American, but most of the voice models sound British, so it matches
+    "Z": " Zed ",
     "Б": "Бэ",
     'В': "Вэ",
     'Г': 'Гэ',
@@ -55,8 +55,6 @@ alphabet_map = {
 
 
 def preprocess(string):
-    # the order for some of these matter
-    # For example, you need to remove the commas in numbers before expanding them
     string = remove_surrounded_chars(string)
     string = string.replace('"', '')
     string = string.replace('\u201D', '').replace('\u201C', '')  # right and left quote
@@ -67,21 +65,15 @@ def preprocess(string):
     string = replace_roman(string)
     string = hyphen_range_to(string)
     
-    string = separate_abbreviation(string)
+    string = separate_abbreviation_digit(string)
+    string = separate_digit_abbreviation(string)
     string = remove_multiple_dots(string)
     
     string = num_to_words(string)
 
-    # TODO Try to use a ML predictor to expand abbreviations. It's hard, dependent on context, and whether to actually
-    # try to say the abbreviation or spell it out as I've done below is not agreed upon
-
-    # For now, expand abbreviations to pronunciations
-    # replace_abbreviations adds a lot of unnecessary whitespace to ensure separation
     string = replace_abbreviations(string)
     string = replace_lowercase_abbreviations(string)
 
-    # cleanup whitespaces
-    # remove whitespace before punctuation
     string = re.sub(rf'\s+({punctuation})', r'\1', string)
     string = string.strip()
     # compact whitespace
@@ -91,11 +83,6 @@ def preprocess(string):
 
 
 def remove_surrounded_chars(string):
-    # first this expression will check if there is a string nested exclusively between a alt=
-    # and a style= string. This would correspond to only a the alt text of an embedded image
-    # If it matches it will only keep that part as the string, and rend it for further processing
-    # Afterwards this expression matches to 'as few symbols as possible (0 upwards) between any
-    # asterisks' OR' as few symbols as possible (0 upwards) between an asterisk and the end of the string'
     if re.search(r'(?<=alt=)(.*)(?=style=)', string, re.DOTALL):
         m = re.search(r'(?<=alt=)(.*)(?=style=)', string, re.DOTALL)
         string = m.group(0)
@@ -103,7 +90,6 @@ def remove_surrounded_chars(string):
 
 
 def convert_num_locale(text):
-    # This detects locale and converts it to American without comma separators
     pattern = re.compile(r'(?:\s|^)\d{1,3}(?:\.\d{3})+(,\d+)(?:\s|$)')
     result = text
     while True:
@@ -115,7 +101,6 @@ def convert_num_locale(text):
         end = match.end()
         result = result[0:start] + result[start:end].replace('.', '').replace(',', '.') + result[end:len(result)]
 
-    # removes comma separators from existing American numbers
     pattern = re.compile(r'(\d),(\d)')
     result = pattern.sub(r'\1\2', result)
 
@@ -123,13 +108,10 @@ def convert_num_locale(text):
 
 
 def replace_negative(string):
-    # handles situations like -5. -5 would become negative 5, which would then be expanded to negative five
     return re.sub(rf'(\s)(-)(\d+)({punctuation})', r'\1negative \3\4', string)
 
 
 def replace_roman(string):
-    # find a string of roman numerals.
-    # Only 2 or more, to avoid capturing I and single character abbreviations, like names
     pattern = re.compile(rf'\s[IVXLCDM]{{2,}}{punctuation}')
     result = string
     while True:
@@ -162,8 +144,7 @@ def hyphen_range_to(text):
 
 
 def num_to_words(text):
-    # 1000 or 10.23
-    pattern = re.compile(r'\d+\.\d+|\d+')
+    # pattern = re.compile(r'\d+\.\d+|\d+')
     pattern = re.compile(r"\d+")
     # result = pattern.sub(lambda x: num2words(float(x.group())), text)
     result = pattern.sub(lambda x: num2words(int(float(x.group())),lang='ru'), text)
@@ -209,12 +190,16 @@ def match_mapping(char):
     for mapping in alphabet_map.keys():
         if char == mapping:
             return alphabet_map[char]
-
     return char
 
 
-def separate_abbreviation(text):
+def separate_abbreviation_digit(text):
     pattern = re.compile(r'(\b[А-ЯA-Z]+)(\d+\b)')
+    result = pattern.sub(r'\1 \2', text)
+    return result
+
+def separate_digit_abbreviation(text):
+    pattern = re.compile(r'(\d+\b)(\b[А-ЯA-Z]+)')
     result = pattern.sub(r'\1 \2', text)
     return result
 
