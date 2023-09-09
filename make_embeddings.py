@@ -9,17 +9,14 @@ def average_pool(last_hidden_states: Tensor,
     last_hidden = last_hidden_states.masked_fill(~attention_mask[..., None].bool(), 0.0)
     return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
 
-def create_embeddings(string_dict, use_cuda=True):
+def create_embeddings(string_dict, device="cuda"):
     embeddings_raw_name = 'embeddings.npy'
     embeddings_text_name = 'embeddings.txt'
     embeddings_answer_name = 'embeddings_answer.txt'
 
     if not os.path.exists(embeddings_raw_name):
         tokenizer = AutoTokenizer.from_pretrained('intfloat/multilingual-e5-base')
-        if use_cuda:
-            model = AutoModel.from_pretrained('intfloat/multilingual-e5-base').to('cuda')
-        else:
-            model = AutoModel.from_pretrained('intfloat/multilingual-e5-base')
+        model = AutoModel.from_pretrained('intfloat/multilingual-e5-base').to(device)
 
         embeddings = []
 
@@ -34,10 +31,7 @@ def create_embeddings(string_dict, use_cuda=True):
 
         # медленно (лучше батчами), но просто и исполняется один раз
         for line in string_list:
-            if use_cuda:
-                batch_dict = tokenizer(line, max_length=512, padding=True, truncation=True, return_tensors='pt').to('cuda')
-            else:
-                batch_dict = tokenizer(line, max_length=512, padding=True, truncation=True, return_tensors='pt')
+            batch_dict = tokenizer(line, max_length=512, padding=True, truncation=True, return_tensors='pt').to(device)
             outputs = model(**batch_dict)
             embedding = average_pool(outputs.last_hidden_state, batch_dict['attention_mask'])
             embeddings.append(embedding[0])

@@ -1,7 +1,7 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-llm_model = AutoModelForCausalLM.from_pretrained("TheBloke/WizardLM-1.0-Uncensored-CodeLlama-34B-GPTQ", code_revision='gptq-4bit-64g-actorder_True', device_map='cuda')
-llm_tokenizer = AutoTokenizer.from_pretrained("TheBloke/WizardLM-1.0-Uncensored-CodeLlama-34B-GPTQ", code_revision='gptq-4bit-64g-actorder_True', device_map='cuda')
+# llm_model = AutoModelForCausalLM.from_pretrained("TheBloke/WizardLM-1.0-Uncensored-CodeLlama-34B-GPTQ", code_revision='gptq-4bit-64g-actorder_True', device_map='cuda')
+# llm_tokenizer = AutoTokenizer.from_pretrained("TheBloke/WizardLM-1.0-Uncensored-CodeLlama-34B-GPTQ", code_revision='gptq-4bit-64g-actorder_True', device_map='cuda')
 
 def get_reply(text):
     model_inputs = llm_tokenizer([text], return_tensors='pt').to('cuda')

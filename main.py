@@ -2,6 +2,8 @@ import torch
 import numpy as np
 
 use_llm = True
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 # Данные - чтение документа и разбивка на читаемые куски
 import test_loco
@@ -38,7 +40,6 @@ def respond(text, to_text=False):
     for embed in embeddings_raw:
         score = cos(torch.Tensor(embedding), torch.Tensor(embed))
         scores.append(score[0])
-    #print(scores)
     sorted_index = np.argsort(scores)[::-1]
 
     # запрос к LLM
@@ -120,7 +121,7 @@ def type_to_global(input_type):
 with gr.Blocks() as demo:
     # Выбор типа поезда
     type_of_train = gr.Dropdown(choices=types_of_trains, label="Выберите серию тепловоза / электровоза:", value='Все')
-    audio_input = gr.Audio(source="microphone", type="numpy")
+    audio_input = gr.Audio(source="microphone", type="numpy", streaming=True)
     text = gr.Textbox(label="Запрос")
     problem = gr.Textbox(label="Проблема")
     solution = gr.Textbox(label="Метод устранения", lines=4)
@@ -134,8 +135,7 @@ with gr.Blocks() as demo:
     send_button.click(fn=text_wrapper, inputs=text, outputs=[problem, solution, llm_answer, raw_prompt, audio_output])
     type_of_train.change(fn=type_to_global, inputs=type_of_train, outputs=None)
 
-# embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(test_loco.dict, use_cuda=False)
-embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(test_loco.dict, use_cuda=True)
+embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(test_loco.dict, device)
 
 # demo.launch()
 demo.launch(share=True)
