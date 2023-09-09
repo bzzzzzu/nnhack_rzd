@@ -41,7 +41,7 @@ WORKDIR /
 
 EXPOSE 7860
 
-# ENTRYPOINT python3 main.py
+ENTRYPOINT python3 main.py
 
 # docker build -t fttftf_docker:gradio_gpu .
 # docker run --gpus all -it -p 7860:7860 fttftf_docker:gradio_gpu

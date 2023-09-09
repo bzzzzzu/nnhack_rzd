@@ -107,16 +107,14 @@ def respond(text, to_text=False):
         solution_text = f"{solution_text}{embeddings_answer[sorted_index[i]]}"
         answer_string = f"{answer_string}{embeddings_text[sorted_index[i]]}"
 
-    # if to_text is False:
-    return answer_string, solution_text, full_llm_answer, llm_prompt, text
-    # else:
-    #     return answer_string, solution_text, full_llm_answer, llm_prompt, text
+    if to_text == False:
+        return answer_string, solution_text, full_llm_answer, llm_prompt
+    else:
+        return answer_string, solution_text, full_llm_answer, llm_prompt, text
 
 
 def text_wrapper(input_text):
-    type_of_train, answer_string, solution_text, full_llm_answer, llm_prompt = respond(
-        input_text
-    )
+    answer_string, solution_text, full_llm_answer, llm_prompt = respond(input_text)
 
     # full_llm_answer = 'При ручном (дистанционном) управлении холодильнои камерои не включаются жалюзи и электродвигатели вентиляторов'
 
@@ -188,7 +186,6 @@ with gr.Blocks() as demo:
     send_button.click(
         fn=text_wrapper,
         inputs=text,
-        outputs=[problem, solution, llm_answer, raw_prompt, audio_output],
         outputs=[problem, solution, llm_answer, raw_prompt, audio_output],
     )
 
