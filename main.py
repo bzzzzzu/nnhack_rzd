@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 
-use_llm = True
+use_llm = False
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 global_problem = ""
 
@@ -29,7 +29,6 @@ tts = Processor()
 import gradio as gr
 
 types_of_trains = [
-    "2М62",
     "2М62",
     "2ТЭ10М",
     "2ТЭ10МК",
@@ -153,17 +152,20 @@ def save_file(audio_input, problem, solution, llm_answer, name, type_of_train):
 with gr.Blocks() as demo:
     if not os.path.exists("./samples"):
         os.makedirs("./samples")
-
-    type_of_train = gr.Dropdown(
-        choices=types_of_trains,
-        label="Выберите серию тепловоза / электровоза:",
-        value="Все",
-    )
-    audio_input = gr.Audio(source="microphone", type="numpy")
-    clear = gr.Button("Clear")
-
+    # with gr.Column(scale=0.5, min_width=600):
+    #     img1 = gr.Image("./src/rzhd_logo_2.png")
+    with gr.Row():
+        type_of_train = gr.Dropdown(
+            choices=types_of_trains,
+            label="Выберите серию тепловоза / электровоза:",
+            value="Все",
+        )
+        name = gr.Textbox(label="Имя машиниста")
+    with gr.Row():
+        with gr.Column(scale=1, min_width=600):
+            audio_input = gr.Audio(source="microphone", type="numpy")
+            clear = gr.Button("Clear")
     text = gr.Textbox(label="Запрос")
-    name = gr.Textbox(label="Имя машиниста")
     problem = gr.Textbox(label="Проблема")
     solution = gr.Textbox(label="Метод устранения", lines=4)
     llm_answer = gr.Textbox(label="Ответ помощника", lines=7)
@@ -199,11 +201,12 @@ with gr.Blocks() as demo:
         outputs=None,
     )
     clear.click(lambda :None, None, audio_input)
-
+    
 
 embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(
     test_loco.dict, device
 )
 
-# demo.launch()
-demo.launch(server_name="0.0.0.0", share=True)
+
+demo.launch()
+# demo.launch(server_name="0.0.0.0", share=True)
