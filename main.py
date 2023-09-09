@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 
-use_llm = False
+use_llm = True
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 global_problem = ""
 
