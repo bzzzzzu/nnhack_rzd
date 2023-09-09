@@ -18,7 +18,8 @@ if use_llm:
     from text_llm import get_reply
 
 # Озвучка текста
-from tts_model import get_wav_from_text
+from tts_model import Processor
+tts = Processor()
 
 # Gradio main thread
 import gradio as gr
@@ -61,6 +62,7 @@ def respond(text, to_text=False):
 
     if use_llm:
         full_llm_answer = get_reply(llm_prompt)
+        # full_llm_answer =''
     else:
         full_llm_answer = ''
     print(f'llm answer before prune: {full_llm_answer}\n')
@@ -86,6 +88,11 @@ def asr_wrapper(wav):
     whisper_text = speech_to_text(wav)
     return respond(whisper_text, to_text=True)
 
+def tts_speak(input_text):
+    audio = tts.va_speak(input_text)
+    return audio
+    
+
 with gr.Blocks() as demo:
     audio_input = gr.Audio(source="microphone", type="numpy")
     text = gr.Textbox(label="Запрос")
@@ -93,14 +100,19 @@ with gr.Blocks() as demo:
     solution = gr.Textbox(label="Метод устранения", lines=4)
     llm_answer = gr.Textbox(label="Ответ помощника", lines=7)
     raw_prompt = gr.Textbox(label="Raw Prompt", lines=10)
-
     audio_input.stop_recording(fn=asr_wrapper, inputs=audio_input, outputs=[problem, solution, llm_answer, raw_prompt, text])
     text.submit(fn=respond, inputs=text, outputs=[problem, solution, llm_answer, raw_prompt])
+    
+    # debbug without llm
+    # llm_answer.value = 'Ура работает! Неисправна плата ПВАД или БОАД УОИ. Проверить наличие тока через мотор-вентиляторы и резисторы ЭДТ. Если есть неисправность, то не пользоваться ЭДТ. Если возникает в режиме "Тяги", то отключить ОМ1, ОМ2, ОМ3.'
+    llm_speech = tts_speak(llm_answer.value)
+    audio_output = gr.Audio((22050, llm_speech), type="numpy")
 
     send_button = gr.Button(value="Отправить")
-    send_button.click(fn=respond, inputs=text, outputs=[problem, solution, llm_answer, raw_prompt])
+    send_button.click(fn=respond, inputs=text, outputs=[problem, solution, llm_answer, raw_prompt, audio_output])
 
+# embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(test_loco.dict, use_cuda=False)
 embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(test_loco.dict, use_cuda=True)
 
-#demo.launch()
-demo.launch(share=True)
+demo.launch()
+# demo.launch(share=True)
