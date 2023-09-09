@@ -23,5 +23,5 @@ num2words
 
 # git clone https://github.com/PanQiWei/AutoGPTQ
 # pip3 install AutoGPTQ/.
-# если ставить не из исходников, cuda на windows не подцепляется
+# if you install it not from the source, cuda will not pick up on windows
 # Successfully installed auto-gptq-0.5.0.dev0+cu117 gekko-1.0.6
