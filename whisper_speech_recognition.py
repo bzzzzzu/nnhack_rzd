@@ -4,7 +4,7 @@ import torchaudio
 from denoiser import pretrained
 from denoiser.dsp import convert_audio
 import torchaudio.transforms as T
-
+import numpy as np
 
 def speech_to_text(wav):
     audio = wav[1]
@@ -28,6 +28,7 @@ def speech_to_text(wav):
     )
     with torch.no_grad():
         denoised_audio = model_denoiser(audio[None])[0].data.cpu().numpy()
+    denoised_audio = np.squeeze(denoised_audio)
 
     predictions = model_whisper.transcribe(denoised_audio, language="ru")["text"]
     return predictions

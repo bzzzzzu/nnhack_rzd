@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-use_llm = False
+use_llm = True
 
 # Данные - чтение документа и разбивка на читаемые куски
 import test_loco
@@ -102,5 +102,5 @@ with gr.Blocks() as demo:
 
 embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(test_loco.dict, use_cuda=True)
 
-demo.launch()
-#demo.launch(share=True)
+#demo.launch()
+demo.launch(share=True)
