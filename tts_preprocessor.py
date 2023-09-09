@@ -4,32 +4,32 @@ from num2words import num2words
 
 punctuation = r'[\s,.?!/)\'\]>]'
 alphabet_map = {
-    "A": " Ei ",
-    "B": " Bee ",
-    "C": " See ",
-    "D": " Dee ",
-    "E": " Eee ",
-    "F": " Eff ",
-    "G": " Jee ",
-    "H": " Eich ",
-    "I": " Eye ",
-    "J": " Jay ",
-    "K": " Kay ",
-    "L": " El ",
-    "M": " Emm ",
-    "N": " Enn ",
-    "O": " Ohh ",
-    "P": " Pee ",
-    "Q": " Queue ",
-    "R": " Are ",
-    "S": " Ess ",
-    "T": " Tee ",
-    "U": " You ",
-    "V": " Vee ",
-    "W": " Double You ",
-    "X": " Ex ",
-    "Y": " Why ",
-    "Z": " Zed ",
+    "A": " Эй ",
+    "B": " Би ",
+    "C": " Си ",
+    "D": " Ди ",
+    "E": " И ",
+    "F": " Эф ",
+    "G": " Джи ",
+    "H": " Эйч ",
+    "I": " Ай ",
+    "J": " Джей ",
+    "K": " Кей ",
+    "L": " Эл ",
+    "M": " Эм ",
+    "N": " Эн ",
+    "O": " Оу ",
+    "P": " Пи ",
+    "Q": " Кью ",
+    "R": " Ар ",
+    "S": " Эс ",
+    "T": " Ти ",
+    "U": " Ю ",
+    "V": " Ви ",
+    "W": " Дабл ю ",
+    "X": " Икс ",
+    "Y": " Игрик ",
+    "Z": " Зэт ",
     "Б": "Бэ",
     'В': "Вэ",
     'Г': 'Гэ',
@@ -152,7 +152,7 @@ def num_to_words(text):
 
 
 def replace_abbreviations(sequence_2):
-    abbreviations_2 = re.findall(r'\b[А-Я]{2,}\b', sequence_2)
+    abbreviations_2 = re.findall(r'\b[А-ЯA-Z]{2,}\b', sequence_2)
     for abb in abbreviations_2:
         ch = ''
         for i in abb:
@@ -165,7 +165,7 @@ def replace_abbreviations(sequence_2):
 
 def replace_lowercase_abbreviations(string):
     # abbreviations 1 to 4 characters long, separated by dots i.e. e.g.
-    pattern = re.compile(rf'(^|[\s(.\'\[<])(([а-я]\.){{1,4}})({punctuation}|$)')
+    pattern = re.compile(rf'(^|[\s(.\'\[<])(([А-ЯA-Z]\.){{1,4}})({punctuation}|$)')
     result = string
     while True:
         match = pattern.search(result)
