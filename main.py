@@ -5,6 +5,7 @@ import pandas as pd
 
 use_llm = True
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+global_problem = ""
 
 # Данные - чтение документа и разбивка на читаемые куски
 import test_loco
@@ -51,6 +52,7 @@ selected_train_type = None
 
 
 def respond(text, to_text=False):
+    global global_problem
     print(f"user question: {text}")
     embedding = get_embedding(text)
 
@@ -90,7 +92,6 @@ def respond(text, to_text=False):
 
     if use_llm:
         full_llm_answer = get_reply(llm_prompt)
-        # full_llm_answer =''
     else:
         full_llm_answer = ""
     print(f"llm answer before prune: {full_llm_answer}\n")
@@ -101,11 +102,15 @@ def respond(text, to_text=False):
     print("------------")
     # full_llm_answer = full_llm_answer + str(len(full_llm_answer))
 
-    solution_text = ""
-    answer_string = ""
-    for i in range(0, 4):
-        solution_text = f"{solution_text}{embeddings_answer[sorted_index[i]]}"
-        answer_string = f"{answer_string}{embeddings_text[sorted_index[i]]}"
+    solution_text = "".join([f"{i + 1}) {embeddings_answer[sorted_index[i]]}" for i in range(3)])
+    answer_string = "".join([f"{i + 1}) {embeddings_text[sorted_index[i]]}" for i in range(3)])
+
+    if not global_problem:
+        sol_1 = embeddings_answer[sorted_index[0]][0].lower() + embeddings_answer[sorted_index[0]][1:]
+        problem_1 = embeddings_text[sorted_index[0]][0].lower() + embeddings_text[sorted_index[0]][1:]
+        global_problem = f"\n Ваша предыдущая проблема это: {problem_1}" + f" Мой совет: {sol_1}"
+    else:
+        answer_string += global_problem 
 
     if to_text == False:
         return answer_string, solution_text, full_llm_answer, llm_prompt
@@ -115,9 +120,6 @@ def respond(text, to_text=False):
 
 def text_wrapper(input_text):
     answer_string, solution_text, full_llm_answer, llm_prompt = respond(input_text)
-
-    # full_llm_answer = 'При ручном (дистанционном) управлении холодильнои камерои не включаются жалюзи и электродвигатели вентиляторов'
-
     audio = tts.va_speak(full_llm_answer)
     return answer_string, solution_text, full_llm_answer, llm_prompt, audio
 
@@ -127,9 +129,6 @@ def asr_wrapper(wav):
     answer_string, solution_text, full_llm_answer, llm_prompt, text = respond(
         whisper_text, to_text=True
     )
-
-    # full_llm_answer = 'При ручном (дистанционном) управлении холодильнои камерои не включаются жалюзи и электродвигатели вентиляторов ОМ2, ОМ5, 5ОМ, 12ЦКК'
-
     audio = tts.va_speak(full_llm_answer)
     return answer_string, solution_text, full_llm_answer, llm_prompt, text, audio
 
