@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 
-use_llm = False
+use_llm = True
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 # Данные - чтение документа и разбивка на читаемые куски
@@ -204,5 +204,5 @@ embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(
     test_loco.dict, device
 )
 
-demo.launch()
-# demo.launch(server_name="0.0.0.0", share=True)
+# demo.launch()
+demo.launch(server_name="0.0.0.0", share=True)
