@@ -137,7 +137,7 @@ with gr.Blocks() as demo:
 embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(test_loco.dict, device)
 
 # demo.launch()
-demo.launch(share=True)
+demo.launch(server_name="0.0.0.0", share=True)
 
 
 
