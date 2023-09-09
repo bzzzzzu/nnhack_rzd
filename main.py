@@ -1,8 +1,8 @@
 import torch
 import numpy as np
+import time
 
 use_llm = True
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 # Данные - чтение документа и разбивка на читаемые куски
@@ -98,7 +98,7 @@ def text_wrapper(input_text):
     return answer_string, solution_text, full_llm_answer, llm_prompt, audio
 
 def asr_wrapper(wav):
-    whisper_text = speech_to_text(wav)
+    whisper_text = speech_to_text(wav, device)
     answer_string, solution_text, full_llm_answer, llm_prompt, text = respond(whisper_text, to_text=True)
     
     # full_llm_answer = 'При ручном (дистанционном) управлении холодильнои камерои не включаются жалюзи и электродвигатели вентиляторов ОМ2, ОМ5, 5ОМ, 12ЦКК'
@@ -117,11 +117,10 @@ def type_to_global(input_type):
     # print(selected_train_type)
     return selected_train_type
 
-
 with gr.Blocks() as demo:
     # Выбор типа поезда
     type_of_train = gr.Dropdown(choices=types_of_trains, label="Выберите серию тепловоза / электровоза:", value='Все')
-    audio_input = gr.Audio(source="microphone", type="numpy", streaming=True)
+    audio_input = gr.Audio(source="microphone", type="numpy")
     text = gr.Textbox(label="Запрос")
     problem = gr.Textbox(label="Проблема")
     solution = gr.Textbox(label="Метод устранения", lines=4)
