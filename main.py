@@ -160,6 +160,8 @@ with gr.Blocks() as demo:
         value="Все",
     )
     audio_input = gr.Audio(source="microphone", type="numpy")
+    clear = gr.Button("Clear")
+
     text = gr.Textbox(label="Запрос")
     name = gr.Textbox(label="Имя машиниста")
     problem = gr.Textbox(label="Проблема")
@@ -175,6 +177,7 @@ with gr.Blocks() as demo:
         inputs=audio_input,
         outputs=[problem, solution, llm_answer, raw_prompt, text, audio_output],
     )
+
     text.submit(
         fn=text_wrapper,
         inputs=text,
@@ -195,6 +198,8 @@ with gr.Blocks() as demo:
         inputs=[text, problem, solution, llm_answer, name, type_of_train],
         outputs=None,
     )
+    clear.click(lambda :None, None, audio_input)
+
 
 embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(
     test_loco.dict, device
