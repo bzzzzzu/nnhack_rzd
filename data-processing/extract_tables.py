@@ -30,7 +30,7 @@ def extract_tables_as_csv_files_in_folder(path_to_kasha_csv):
         for row in kasha.readlines():
 
             # Find start of table
-            if row == 'N";Неисправность;Вероятная причина;Метод устранения\n' or row == 'N;Неисправность;Вероятная причина;Метод устранения неисправности\n':
+            if row[:12] == 'Приложение N':
                 flag = True
                 continue
 
