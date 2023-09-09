@@ -7,17 +7,18 @@ import torchaudio.transforms as T
 import numpy as np
 from transliterate import translit
 
+if torch.cuda.is_available():
+    model_whisper = whisper.load_model("small", device="cuda")
+else:
+    model_whisper = whisper.load_model("tiny", device="cpu")
+
+model_denoiser = pretrained.dns64()
 
 def speech_to_text(wav, device="cuda"):
     audio = wav[1]
     sr = wav[0]
 
     resampler = torchaudio.transforms.Resample(sr, 16000)
-    model_denoiser = pretrained.dns64()
-    if device.type == 'cuda':
-        model_whisper = whisper.load_model("small", device=device)
-    else:
-        model_whisper = whisper.load_model("tiny", device=device)
 
     audio = resampler(torch.Tensor(audio))
     # wav_2 = wav_2 * 32768.0

@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 
-use_llm = True
+use_llm = False
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 # Данные - чтение документа и разбивка на читаемые куски
@@ -107,14 +107,16 @@ def respond(text, to_text=False):
         solution_text = f"{solution_text}{embeddings_answer[sorted_index[i]]}"
         answer_string = f"{answer_string}{embeddings_text[sorted_index[i]]}"
 
-    if to_text == False:
-        return answer_string, solution_text, full_llm_answer, llm_prompt
-    else:
-        return answer_string, solution_text, full_llm_answer, llm_prompt, text
+    # if to_text is False:
+    return answer_string, solution_text, full_llm_answer, llm_prompt, text
+    # else:
+    #     return answer_string, solution_text, full_llm_answer, llm_prompt, text
 
 
 def text_wrapper(input_text):
-    answer_string, solution_text, full_llm_answer, llm_prompt = respond(input_text)
+    type_of_train, answer_string, solution_text, full_llm_answer, llm_prompt = respond(
+        input_text
+    )
 
     # full_llm_answer = 'При ручном (дистанционном) управлении холодильнои камерои не включаются жалюзи и электродвигатели вентиляторов'
 
@@ -187,6 +189,7 @@ with gr.Blocks() as demo:
         fn=text_wrapper,
         inputs=text,
         outputs=[problem, solution, llm_answer, raw_prompt, audio_output],
+        outputs=[problem, solution, llm_answer, raw_prompt, audio_output],
     )
 
     type_of_train.change(fn=type_to_global, inputs=type_of_train, outputs=None)
@@ -201,5 +204,5 @@ embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(
     test_loco.dict, device
 )
 
-# demo.launch()
-demo.launch(server_name="0.0.0.0", share=True)
+demo.launch()
+# demo.launch(server_name="0.0.0.0", share=True)
