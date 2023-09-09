@@ -84,9 +84,16 @@ def respond(text, to_text=False):
     else:
         return answer_string, solution_text, full_llm_answer, llm_prompt, text
 
+def text_wrapper(input_text):
+    answer_string, solution_text, full_llm_answer, llm_prompt = respond(input_text)
+    audio = tts.va_speak(full_llm_answer)
+    return answer_string, solution_text, full_llm_answer, llm_prompt, audio
+
 def asr_wrapper(wav):
     whisper_text = speech_to_text(wav)
-    return respond(whisper_text, to_text=True)
+    answer_string, solution_text, full_llm_answer, llm_prompt, text = respond(whisper_text, to_text=True)
+    audio = tts.va_speak(full_llm_answer)
+    return answer_string, solution_text, full_llm_answer, llm_prompt, text, audio
 
 def tts_speak(input_text):
     audio = tts.va_speak(input_text)
@@ -100,19 +107,20 @@ with gr.Blocks() as demo:
     solution = gr.Textbox(label="Метод устранения", lines=4)
     llm_answer = gr.Textbox(label="Ответ помощника", lines=7)
     raw_prompt = gr.Textbox(label="Raw Prompt", lines=10)
-    audio_input.stop_recording(fn=asr_wrapper, inputs=audio_input, outputs=[problem, solution, llm_answer, raw_prompt, text])
-    text.submit(fn=respond, inputs=text, outputs=[problem, solution, llm_answer, raw_prompt])
+    audio_output = gr.Audio(type="numpy", autoplay=True)
+
+    audio_input.stop_recording(fn=asr_wrapper, inputs=audio_input, outputs=[problem, solution, llm_answer, raw_prompt, text, audio_output])
+    text.submit(fn=text_wrapper, inputs=text, outputs=[problem, solution, llm_answer, raw_prompt, audio_output])
     
     # debbug without llm
     # llm_answer.value = 'Ура работает! Неисправна плата ПВАД или БОАД УОИ. Проверить наличие тока через мотор-вентиляторы и резисторы ЭДТ. Если есть неисправность, то не пользоваться ЭДТ. Если возникает в режиме "Тяги", то отключить ОМ1, ОМ2, ОМ3.'
-    llm_speech = tts_speak(llm_answer.value)
-    audio_output = gr.Audio((22050, llm_speech), type="numpy")
+    # llm_speech = tts_speak(llm_answer.value)
 
     send_button = gr.Button(value="Отправить")
-    send_button.click(fn=respond, inputs=text, outputs=[problem, solution, llm_answer, raw_prompt, audio_output])
+    send_button.click(fn=text_wrapper, inputs=text, outputs=[problem, solution, llm_answer, raw_prompt, audio_output])
 
 # embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(test_loco.dict, use_cuda=False)
 embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(test_loco.dict, use_cuda=True)
 
-demo.launch()
-# demo.launch(share=True)
+# demo.launch()
+demo.launch(share=True)

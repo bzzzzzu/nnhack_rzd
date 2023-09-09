@@ -19,11 +19,14 @@ class Processor:
 
         self.model_path = model_path
         self.model_name = model_name
+        print(model_path)
         if self.model_path.exists():
-            self.tts = TTS(model_path, add_time_to_end=0.8)      # add_time_to_end продолжительность аудио
+            #self.tts = TTS(model_path, add_time_to_end=0.8)      # add_time_to_end продолжительность аудио
+            self.tts = TTS(model_path)
         else:
             print('Скачивание модели...')
-            self.tts = TTS(model_name, add_time_to_end=0.8)
+            #self.tts = TTS(model_name, add_time_to_end=0.8)
+            self.tts = TTS(model_name)
         
         self.accentizer = RUAccent(workdir="./model")
         self.accentizer.load(omograph_model_size='medium', dict_load_startup=False)
@@ -36,7 +39,7 @@ class Processor:
         audio = self.tts(text, play)
         if save:
             self.tts.save_wav(audio, f'{output_dir}/audio_{time_stamp}.wav')
-        return audio
+        return (22050, audio)
 
 
 if __name__ == '__main__':
