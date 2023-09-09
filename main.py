@@ -8,7 +8,6 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 
 # Данные - чтение документа и разбивка на читаемые куски
 import test_loco
-from document_reader import get_text_from_document
 
 # Эмбеддинги
 from make_embeddings import create_embeddings, get_embedding
@@ -115,9 +114,7 @@ def respond(text, to_text=False):
 
 
 def text_wrapper(input_text):
-    type_of_train, answer_string, solution_text, full_llm_answer, llm_prompt = respond(
-        input_text
-    )
+    answer_string, solution_text, full_llm_answer, llm_prompt = respond(input_text)
 
     # full_llm_answer = 'При ручном (дистанционном) управлении холодильнои камерои не включаются жалюзи и электродвигатели вентиляторов'
 
@@ -189,7 +186,7 @@ with gr.Blocks() as demo:
     send_button.click(
         fn=text_wrapper,
         inputs=text,
-        outputs=[audio_input, problem, solution, llm_answer, raw_prompt, audio_output],
+        outputs=[problem, solution, llm_answer, raw_prompt, audio_output],
     )
 
     type_of_train.change(fn=type_to_global, inputs=type_of_train, outputs=None)
