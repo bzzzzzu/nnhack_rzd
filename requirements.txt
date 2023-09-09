@@ -1,10 +1,10 @@
 gradio
 transformers
-torch==1.13.1
+# torch==1.13.1
 numpy
 accelerate
 optimum
-auto-gptq
+# auto-gptq
 
 # STT
 openai-whisper
@@ -17,11 +17,11 @@ RUTTS
 ruaccent
 num2words
 
-
-
 # pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117
 
 # git clone https://github.com/PanQiWei/AutoGPTQ
 # pip3 install AutoGPTQ/.
-# if you install it not from the source, cuda will not pick up on windows
+# ^ works on windows, another kind of dark magic required on linux, see dockerfile
 # Successfully installed auto-gptq-0.5.0.dev0+cu117 gekko-1.0.6
+
+# auto-gptq and torch==1.13.1 commented for docker
