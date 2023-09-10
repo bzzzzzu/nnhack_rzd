@@ -168,7 +168,7 @@ with gr.Blocks(title="RZD Voice Assistant fttftf") as demo:
     with gr.Row():
         with gr.Column(scale=1, min_width=300):
             audio_input = gr.Audio(source="microphone", type="numpy")
-            clear = gr.Button("Clear")
+            clear = gr.Button("Очистить")
         audio_output = gr.Audio(type="numpy", autoplay=True)
     with gr.Row():
         text = gr.Textbox(label="Запрос")
