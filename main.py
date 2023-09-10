@@ -76,7 +76,7 @@ def respond(text, to_text=False):
     llm_prompt = llm_prompt + f"Запрос пользователя: {text}\n"
     # Retrieval-Augmented Generation, 4 nearest examples from embedding database + solutions
     llm_prompt = llm_prompt + "Context: "
-    for i in range(0, 4):
+    for i in range(0, 3):
         problem_text = str.replace(embeddings_text[sorted_index[i]], "\n", "")
         solution_text = str.replace(embeddings_answer[sorted_index[i]], "\n", "")
         story_text = f"Проблема: {problem_text}, Решение: {solution_text}\n"
