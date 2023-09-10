@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 
-use_llm = True
+use_llm = False
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 global_problem = ""
 
@@ -148,12 +148,16 @@ def save_file(audio_input, problem, solution, llm_answer, name, type_of_train):
     data_user.loc[len(data_user)] = [audio_input, llm_answer, problem, solution]
     data_user.to_csv(file_name, index=False)
 
+def pass_logo():
+    pass
 
-with gr.Blocks() as demo:
+# my_theme = gr.Theme.from_hub('rottenlittlecreature/Moon_Goblin')
+with gr.Blocks(title="RZD Voice Assistant fttftf") as demo:
     if not os.path.exists("./samples"):
         os.makedirs("./samples")
-    # with gr.Column(scale=0.5, min_width=600):
-    #     img1 = gr.Image("./src/rzhd_logo_2.png")
+
+    # with gr.Column(scale=2, min_width=600):
+    #     img1 = gr.Image("./src/RZD.png")
     with gr.Row():
         type_of_train = gr.Dropdown(
             choices=types_of_trains,
@@ -162,15 +166,20 @@ with gr.Blocks() as demo:
         )
         name = gr.Textbox(label="Имя машиниста")
     with gr.Row():
-        with gr.Column(scale=1, min_width=600):
+        with gr.Column(scale=1, min_width=300):
             audio_input = gr.Audio(source="microphone", type="numpy")
             clear = gr.Button("Clear")
-    text = gr.Textbox(label="Запрос")
-    problem = gr.Textbox(label="Проблема")
-    solution = gr.Textbox(label="Метод устранения", lines=4)
-    llm_answer = gr.Textbox(label="Ответ помощника", lines=7)
-    raw_prompt = gr.Textbox(label="Raw Prompt", lines=10, visible=False)
-    audio_output = gr.Audio(type="numpy", autoplay=True)
+        audio_output = gr.Audio(type="numpy", autoplay=True)
+    with gr.Row():
+        text = gr.Textbox(label="Запрос")
+    with gr.Row():
+        problem = gr.Textbox(label="Проблема")
+    with gr.Row():
+        solution = gr.Textbox(label="Метод устранения", lines=4)
+    with gr.Row():
+        llm_answer = gr.Textbox(label="Ответ помощника", lines=7)
+    with gr.Row():
+        raw_prompt = gr.Textbox(label="Raw Prompt", lines=10, visible=False)
 
     data_user = pd.DataFrame(columns=["user_data", "llm_answer", "problem", "solution"])
 

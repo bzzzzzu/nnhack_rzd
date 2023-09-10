@@ -67,8 +67,8 @@ def preprocess(string):
     
     string = separate_abbreviation_digit(string)
     string = separate_digit_abbreviation(string)
+    string = odin(string)
     string = remove_multiple_dots(string)
-    
     string = num_to_words(string)
 
     string = replace_abbreviations(string)
@@ -206,6 +206,13 @@ def separate_digit_abbreviation(text):
 def remove_multiple_dots(text):
     result = re.sub(r'\.{2,3}', '', text)
     return result
+
+odin_list = ['1', '1.', 'Один', 'один']
+def odin(text: str):
+    for i in odin_list:
+        if i in text: 
+            text = text.replace(i, 'од+ин')
+    return text
 
 def __main__(args):
     print(preprocess(args[1]))
