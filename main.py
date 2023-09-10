@@ -208,5 +208,5 @@ embeddings_raw, embeddings_text, embeddings_answer = create_embeddings(
 )
 
 
-demo.launch()
-# demo.launch(server_name="0.0.0.0", share=True)
+# demo.launch()
+demo.launch(server_name="0.0.0.0", share=True)
